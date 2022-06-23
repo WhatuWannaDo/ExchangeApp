@@ -17,10 +17,10 @@ fun SetupNavGraph(navController: NavHostController, currencyViewModel: CurrencyV
             MainMenu(currencyViewModel = currencyViewModel, navController)
         })
         composable(route = Screens.FavoriteCurrencies.route, content = {
-            FavoriteCurrencies()
+            FavoriteCurrencies(navController = navController, currencyViewModel = currencyViewModel)
         })
         composable(route = Screens.Settings.route, content = {
-            Settings()
+            Settings(navController = navController)
         })
     })
 }
