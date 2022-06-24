@@ -20,7 +20,7 @@ fun SetupNavGraph(navController: NavHostController, currencyViewModel: CurrencyV
             FavoriteCurrencies(navController = navController, currencyViewModel = currencyViewModel)
         })
         composable(route = Screens.Settings.route, content = {
-            Settings(navController = navController)
+            Settings(navController = navController, activity)
         })
     })
 }

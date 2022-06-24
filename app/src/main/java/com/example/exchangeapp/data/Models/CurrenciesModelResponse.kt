@@ -136,7 +136,7 @@ data class Rates(
     val SBD: Double,
     val USD: Double,
 ){
-    fun getCurrenciesAsList() : List<Any> = listOf(
+    fun getCurrenciesAsList() : List<Double> = listOf(
         AED,
         AFN,
         ALL,

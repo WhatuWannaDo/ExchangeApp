@@ -2,7 +2,9 @@ package com.example.exchangeapp.ui.MainMenu
 
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
 import androidx.collection.ArrayMap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -212,8 +214,8 @@ fun DropDownMenuCurrencies(currencyViewModel: CurrencyViewModel, dropDownMenuSta
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LazyColumnMainMenu(list : List<String>, currencyViewModel: CurrencyViewModel, activity: MainActivity){
-    var currenciesList = emptyList<Any>()
-    var map = emptyMap<String, Any>()
+    var currenciesList = emptyList<Double>()
+    var map = emptyMap<String, Double>()
 
     currencyViewModel.currencyResponse.observe(activity, Observer {response ->
         if (response.isSuccessful){
@@ -224,7 +226,19 @@ fun LazyColumnMainMenu(list : List<String>, currencyViewModel: CurrencyViewModel
     
     LazyColumn(contentPadding = PaddingValues(vertical = 80.dp), verticalArrangement = Arrangement.spacedBy(10.dp)){
 
-        items(map.toList()){
+        val sharedPefs = activity.getSharedPreferences("Sort", Context.MODE_PRIVATE)
+        val mapToList = map.toList()
+        val sortedList : List<Pair<String, Double>> =
+            when(sharedPefs.getString("SortSelected", "По алфавиту(с начала)").toString()){
+            "По алфавиту(с начала)" -> mapToList
+            "По алфавиту(с конца)" -> mapToList.asReversed()
+            "По возрастанию" -> mapToList.sortedBy { it.second }
+            "По убыванию" -> mapToList.sortedBy { it.second }.asReversed()
+            else -> {mapToList}
+        }
+
+
+        items(sortedList){
             Box(modifier = Modifier
                 .border(2.dp, color = Color.DarkGray, shape = RoundedCornerShape(15.dp))
                 .fillParentMaxWidth()) {
@@ -236,6 +250,7 @@ fun LazyColumnMainMenu(list : List<String>, currencyViewModel: CurrencyViewModel
                         GlobalScope.launch(Dispatchers.IO) {
                             currencyViewModel.addCurrency(CurrencyModel(0, it.first, it.second.toString()))
                         }
+                        Toast.makeText(activity, "Добавлено в избранное", Toast.LENGTH_SHORT).show()
                     })
                 }
             }
