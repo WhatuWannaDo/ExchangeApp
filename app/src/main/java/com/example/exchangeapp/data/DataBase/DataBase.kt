@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.exchangeapp.data.Models.CurrencyModel
 
-@Database(entities = [CurrencyModel::class], exportSchema = false, version = 1)
+@Database(entities = [CurrencyModel::class], exportSchema = false, version = 2)
 abstract class DataBase : RoomDatabase() {
     abstract fun favoriteCurrencyDAO() : FavoriteCurrencyDAO
 

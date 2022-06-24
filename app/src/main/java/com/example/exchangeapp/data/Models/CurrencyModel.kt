@@ -8,5 +8,5 @@ data class CurrencyModel(
     @PrimaryKey(autoGenerate = true)
     val id : Int,
     val currency : String,
-    val amount : Double
+    val amount : String
 )

@@ -51,14 +51,14 @@ fun TopAppBarFavoriteCurrencies(navController: NavController){
 @Composable
 fun LazyColumnFavorites(list: List<CurrencyModel>){
 
-    LazyColumn(contentPadding = PaddingValues(vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)){
+    LazyColumn(contentPadding = PaddingValues(vertical = 80.dp), verticalArrangement = Arrangement.spacedBy(10.dp)){
         items(list){
             Box(modifier = Modifier
                 .border(2.dp, color = Color.DarkGray, shape = RoundedCornerShape(15.dp))
                 .fillParentMaxWidth()) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Валюта: " + it.currency)
-                    Text(text = " Курс: " + it.amount.toString())
+                    Text(text = " Курс: " + it.amount)
 
                 }
             }
