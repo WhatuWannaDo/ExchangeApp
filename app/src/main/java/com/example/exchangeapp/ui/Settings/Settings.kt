@@ -66,7 +66,7 @@ fun TopAppBarSettings(navController: NavController){
         }
     )
 }
-
+// fun for get radio button statement
 fun getSort(activity: MainActivity) : Int {
     val prefsSort : SharedPreferences = activity.getSharedPreferences("Sort", MODE_PRIVATE)
     when(prefsSort.getString("SortSelected", "По алфавиту(с начала)").toString()){

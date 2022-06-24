@@ -56,9 +56,10 @@ fun LazyColumnFavorites(list: List<CurrencyModel>){
             Box(modifier = Modifier
                 .border(2.dp, color = Color.DarkGray, shape = RoundedCornerShape(15.dp))
                 .fillParentMaxWidth()) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Валюта: " + it.currency)
-                    Text(text = " Курс: " + it.amount)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(text = " Валюта: " + it.currency, style = MaterialTheme.typography.titleLarge)
+                    Text(text = " Курс: " + it.amount, style = MaterialTheme.typography.titleLarge)
+                    Text(text = " Относительно " + it.selectedCurrency, style = MaterialTheme.typography.titleLarge)
 
                 }
             }
