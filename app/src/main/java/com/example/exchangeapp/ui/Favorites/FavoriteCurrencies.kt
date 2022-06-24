@@ -1,5 +1,6 @@
 package com.example.exchangeapp.ui.Favorites
 
+import android.annotation.SuppressLint
 import android.app.LauncherActivity
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +25,7 @@ import com.example.exchangeapp.ui.screens.Screens
 import com.example.exchangeapp.ui.theme.Typography
 
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteCurrencies(navController: NavController, currencyViewModel: CurrencyViewModel){
@@ -57,6 +59,7 @@ fun LazyColumnFavorites(list: List<CurrencyModel>){
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Валюта: " + it.currency)
                     Text(text = " Курс: " + it.amount.toString())
+
                 }
             }
         }

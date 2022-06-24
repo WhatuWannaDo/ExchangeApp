@@ -1,5 +1,6 @@
 package com.example.exchangeapp.ui.Settings
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.navigation.NavController
 import com.example.exchangeapp.ui.MainMenu.TopAppBarMainMenu
 import com.example.exchangeapp.ui.screens.Screens
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Settings(navController: NavController){

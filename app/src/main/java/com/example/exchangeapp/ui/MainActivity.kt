@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     navController = rememberNavController()
-                    SetupNavGraph(navController = navController, currencyViewModel)
+                    SetupNavGraph(navController = navController, currencyViewModel, this)
                 }
             }
         }

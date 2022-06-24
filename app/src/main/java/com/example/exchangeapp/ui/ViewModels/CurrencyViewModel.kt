@@ -1,17 +1,17 @@
 package com.example.exchangeapp.ui.ViewModels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
+import com.example.exchangeapp.data.DI.CurrenciesAPIModule
 import com.example.exchangeapp.data.DataBase.DataBase
+import com.example.exchangeapp.data.Models.CurrenciesModelResponse
 import com.example.exchangeapp.data.Models.CurrencyModel
 import com.example.exchangeapp.domain.Repository.CurrencyRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,17 +19,26 @@ class CurrencyViewModel @Inject constructor(application: Application) : AndroidV
 
     private val currencyRepository : CurrencyRepository
     val getAllCurrencies : Flow<List<CurrencyModel>>
+    var currencyResponse: MutableLiveData<Response<CurrenciesModelResponse>> = MutableLiveData()
 
 
     init {
         val currencyDAO = DataBase.getDataBase(application).favoriteCurrencyDAO()
-        currencyRepository = CurrencyRepository(currencyDAO)
+        val currenciesAPI = CurrenciesAPIModule.provideCurrenciesApi(CurrenciesAPIModule.provideRetrofit())
+        currencyRepository = CurrencyRepository(currencyDAO, currenciesAPI)
         getAllCurrencies = currencyRepository.getAllCurrencies
     }
 
     suspend fun addCurrency(currencyModel: CurrencyModel){
         viewModelScope.launch(Dispatchers.IO) {
             currencyRepository.addCurrency(currencyModel)
+        }
+    }
+
+    fun getCurrencies(base : String){
+        viewModelScope.launch{
+            val response = currencyRepository.getCurrencies(base)
+            currencyResponse.value = response
         }
     }
 
