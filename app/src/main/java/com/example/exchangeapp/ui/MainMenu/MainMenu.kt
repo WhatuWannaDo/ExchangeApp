@@ -30,10 +30,9 @@ import com.example.exchangeapp.ui.MainActivity
 import com.example.exchangeapp.ui.ViewModels.CurrencyViewModel
 import com.example.exchangeapp.ui.screens.Screens
 import com.google.gson.Gson
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import okhttp3.internal.notify
+import okhttp3.internal.wait
 import retrofit2.awaitResponse
 
 
@@ -171,7 +170,7 @@ fun MainMenu(currencyViewModel: CurrencyViewModel, navController: NavController,
         "SBD",
         "USD",
     )
-    Scaffold(topBar = { TopAppBarMainMenu(navController = navController,  dropDownMenuCurrenciesState)}) {
+    Scaffold(topBar = { TopAppBarMainMenu(navController = navController,  dropDownMenuCurrenciesState, activity)}) {
         LazyColumnMainMenu(currenciesList, currencyViewModel, activity)
 
     }
@@ -180,10 +179,11 @@ fun MainMenu(currencyViewModel: CurrencyViewModel, navController: NavController,
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TopAppBarMainMenu(navController: NavController, dropDownMenuState : MutableState<Boolean>){
+fun TopAppBarMainMenu(navController: NavController, dropDownMenuState : MutableState<Boolean>, activity: MainActivity){
+    val currency = activity.getSharedPreferences("CurrencyPrefs", Context.MODE_PRIVATE).getString("Currency", "Выберите валюту")
 
     SmallTopAppBar(
-        title = { Text(text = "Выбор валюты", modifier = Modifier.clickable {
+        title = { Text(text = currency.toString(), modifier = Modifier.clickable {
             dropDownMenuState.value = true
         })},
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.DarkGray),
@@ -214,6 +214,10 @@ fun DropDownMenuCurrencies(currencyViewModel: CurrencyViewModel, dropDownMenuSta
                 currencyViewModel.getCurrencies(label)
                 currencyEditor.putString("Currency", label).apply()
                 dropDownMenuState.value = false
+                GlobalScope.launch(Dispatchers.Main){
+                    delay(1000)
+                    activity.recreate()
+                }
             }, text = { Text(text = label)})
         }
     }
@@ -235,21 +239,18 @@ fun LazyColumnMainMenu(list : List<String>, currencyViewModel: CurrencyViewModel
             map = list.zip(currenciesList).toMap()
         }
     })
-
-    LazyColumn(contentPadding = PaddingValues(vertical = 80.dp), verticalArrangement = Arrangement.spacedBy(10.dp)){
-
-        //getting sort from settings
-        val sharedPefs = activity.getSharedPreferences("Sort", Context.MODE_PRIVATE)
-        val mapToList = map.toList()
-        val sortedList : List<Pair<String, Double>> =
-            when(sharedPefs.getString("SortSelected", "По алфавиту(с начала)").toString()){
+    //getting sort from settings
+    val sharedPefs = activity.getSharedPreferences("Sort", Context.MODE_PRIVATE)
+    val mapToList = map.toList()
+    val sortedList : List<Pair<String, Double>> =
+        when(sharedPefs.getString("SortSelected", "По алфавиту(с начала)").toString()){
             "По алфавиту(с начала)" -> mapToList
             "По алфавиту(с конца)" -> mapToList.asReversed()
             "По возрастанию" -> mapToList.sortedBy { it.second }
             "По убыванию" -> mapToList.sortedBy { it.second }.asReversed()
             else -> {mapToList}
         }
-
+    LazyColumn(contentPadding = PaddingValues(vertical = 80.dp), verticalArrangement = Arrangement.spacedBy(10.dp)){
 
         items(sortedList){
             Box(modifier = Modifier
@@ -259,13 +260,27 @@ fun LazyColumnMainMenu(list : List<String>, currencyViewModel: CurrencyViewModel
                     Text(text = "  " + it.first, style = MaterialTheme.typography.titleLarge)
                     Spacer(modifier = Modifier.weight(1f, true))
                     Text(text = "Курс: " + it.second.toString() + "   ", style = MaterialTheme.typography.titleLarge)
-                    Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "addToFav", modifier = Modifier.clickable {
-                        GlobalScope.launch(Dispatchers.IO) {
-                            val getCurrency = activity.getSharedPreferences("CurrencyPrefs", MODE_PRIVATE)
-                            currencyViewModel.addCurrency(CurrencyModel(0, getCurrency.getString("Currency", "USD").toString(), it.first, it.second.toString()))
+                    Icon(imageVector = Icons.Default.FavoriteBorder, contentDescription = "addToFav", modifier = Modifier
+                        .clickable {
+                            GlobalScope.launch(Dispatchers.IO) {
+                                val getCurrency =
+                                    activity.getSharedPreferences("CurrencyPrefs", MODE_PRIVATE)
+                                currencyViewModel.addCurrency(
+                                    CurrencyModel(
+                                        0,
+                                        getCurrency
+                                            .getString("Currency", "USD")
+                                            .toString(),
+                                        it.first,
+                                        it.second.toString()
+                                    )
+                                )
+                            }
+                            Toast
+                                .makeText(activity, "Добавлено в избранное", Toast.LENGTH_SHORT)
+                                .show()
                         }
-                        Toast.makeText(activity, "Добавлено в избранное", Toast.LENGTH_SHORT).show()
-                    }.size(40.dp))
+                        .size(40.dp))
                 }
             }
         }
